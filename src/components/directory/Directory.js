@@ -7,7 +7,7 @@ const SECTIONS = [
     title: 'hats',
     imageUrl: 'https://i.ibb.co/cvpntL1/hats.png',
     id: 1,
-    linkUrl: 'shop/hats'
+    linkUrl: 'hats'
   },
   {
     title: 'jackets',
@@ -47,8 +47,8 @@ class Directory extends React.Component {
   }
 
   render() {
-    const sections = this.state.sections.map(({title, imageUrl, id}) => (
-      <MenuItem key={id} title={title} imageUrl={imageUrl} />
+    const sections = this.state.sections.map(({id, ...otherSectionProps}) => (
+      <MenuItem key={id} {...otherSectionProps} />
     ));
 
     return (
