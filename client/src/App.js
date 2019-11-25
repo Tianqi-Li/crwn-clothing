@@ -1,17 +1,19 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, lazy, Suspense} from 'react';
 import {Switch, Route, Redirect} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {createStructuredSelector} from 'reselect';
 
-import CheckoutPage from './pages/checkout/CheckoutPage';
-import HomePage from './pages/HomePage';
-import ShopPage from './pages/shop/ShopPage';
+import ErrorBoundary from './components/error-boundary/ErrorBoundary';
 import Header from './components/header/Header';
-import SignInAndSignUpPage from './pages/sign-in-and-sign-up/SignInAndSignUpPage';
 
 import {selectCurrentUser} from './redux/user/UserSelectors';
 import {checkUserSession} from './redux/user/UserActions';
 import './App.css';
+
+const HomePage = lazy(() => import('./pages/HomePage'));
+const ShopPage = lazy(() => import('./pages/shop/ShopPage'));
+const CheckoutPage = lazy(() => import('./pages/checkout/CheckoutPage'));
+const SignInAndSignUpPage = lazy(() => import('./pages/sign-in-and-sign-up/SignInAndSignUpPage'));
 
 const App = ({checkUserSession, currentUser}) => {
   useEffect(() => {
@@ -22,17 +24,21 @@ const App = ({checkUserSession, currentUser}) => {
     <div>
       <Header />
       <Switch>
-        <Route exact path='/' component={HomePage} />
-        <Route path='/shop' component={ShopPage} />
-        <Route exact path='/checkout' component={CheckoutPage} />
-        <Route
-          exact
-          path='/signin'
-          render={
-            () => currentUser
-              ? (<Redirect to="/" />)
-              : (<SignInAndSignUpPage />)}
-        />
+        <ErrorBoundary>
+          <Suspense fallback={<div>...loading</div>}>
+            <Route exact path='/' component={HomePage} />
+            <Route path='/shop' component={ShopPage} />
+            <Route exact path='/checkout' component={CheckoutPage} />
+            <Route
+              exact
+              path='/signin'
+              render={
+                () => currentUser
+                  ? (<Redirect to="/" />)
+                  : (<SignInAndSignUpPage />)}
+            />
+          </Suspense>
+        </ErrorBoundary>
       </Switch>
     </div>
   );
